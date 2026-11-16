@@ -14,6 +14,7 @@ jobs:
     timeout-minutes: 15
     env:
       NEXUS_DB_PASSWORD: ci-only-password
+      NEXUS_OPERATOR_PASSWORD: workspace-test-password
     steps:
       - uses: actions/checkout@v4
       - name: Build and start
@@ -26,6 +27,15 @@ jobs:
           test "$(docker compose exec -T db psql -U nexus -d nexus -Atc "SELECT count(*) FROM projects WHERE slug = 'portfolio-demo'")" = 1
           curl --fail --silent --show-error http://127.0.0.1:3000 -o workspace.html
           grep -q 'API conectada' workspace.html
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Test the operator journey
+        working-directory: web
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npx playwright test
       - name: Print service logs
         if: failure()
         run: docker compose logs --no-color

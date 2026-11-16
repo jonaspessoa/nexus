@@ -21,7 +21,7 @@ Abra `prototype/index.html` no navegador. Em **Serviços**, selecione **Ver hist
 
 ## Aplicação local
 
-Com Docker Compose instalado, copie `.env.example` para `.env` e troque a senha de desenvolvimento. Por enquanto, use letras, números e hífens na senha porque ela também faz parte da URL de conexão.
+Com Docker Compose instalado, copie `.env.example` para `.env` e troque a senha do banco. Defina também NEXUS_OPERATOR_PASSWORD com pelo menos 16 caracteres para entrar no Workspace. Por enquanto, use letras, números e hífens na senha porque ela também faz parte da URL de conexão.
 
 ```sh
 docker compose up --build -d
