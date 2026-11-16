@@ -71,3 +71,19 @@ def update_task(task_id: int, body: TaskUpdate):
         if row is None:
             raise HTTPException(404, "Task not found")
         return dict(row)
+
+
+class NewProject(BaseModel):
+    name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=120)]
+
+
+@router.post("/projects", status_code=201)
+def create_project(body: NewProject):
+    from uuid import uuid4
+
+    with database().begin() as connection:
+        project = connection.execute(
+            text("INSERT INTO projects (slug, name) VALUES (:slug, :name) RETURNING id, name"),
+            {"slug": uuid4().hex, "name": body.name},
+        ).mappings().one()
+        return dict(project)
