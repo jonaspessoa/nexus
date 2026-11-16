@@ -81,3 +81,22 @@ test("registra a recuperação sem perder a tarefa de investigação", async ({ 
   await page.reload();
   await expect(task).toContainText("Site do portfólio");
 });
+
+test("cadastra projeto e serviço sem a carga de exemplo", async ({ page }) => {
+  await page.goto(base);
+  await page.getByLabel("Senha do operador").fill(process.env.NEXUS_OPERATOR_PASSWORD);
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await page.getByLabel("Nome do projeto").fill("Projeto de teste");
+  await page.getByRole("button", { name: "Criar projeto" }).click();
+
+  const project = page.getByRole("article").filter({
+    has: page.getByRole("heading", { name: "Projeto de teste", exact: true }),
+  });
+  await project.getByText("Adicionar serviço", { exact: true }).click();
+  await project.getByLabel("Nome do serviço").fill("Página de status");
+  await project.getByLabel("URL do serviço").fill("https://example.com/status");
+  await project.getByRole("button", { name: "Cadastrar serviço" }).click();
+  await expect(project.getByRole("button", { name: "Investigar Página de status" })).toBeVisible();
+  await page.reload();
+  await expect(project).toContainText("https://example.com/status");
+});
