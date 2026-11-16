@@ -15,9 +15,9 @@ O primeiro rascunho vai usar uma falha fictícia. Quero conferir se consigo perc
 
 O [roadmap](ROADMAP.md) detalha a ordem das entregas, os critérios de conclusão e as releases do Nexus.
 
-## Protótipo local
+## Demonstração
 
-Abra `prototype/index.html` no navegador. Em **Serviços**, selecione **Ver histórico** e crie uma tarefa a partir da falha fictícia do portfólio. Confira se ela aparece em **Tarefas** com o vínculo ao serviço. As tarefas existem durante a sessão da página.
+Abra a [demo pública](https://jonaspessoa.github.io/nexus/) ou o arquivo `prototype/index.html` no navegador. Em **Serviços**, selecione **Ver histórico** e crie uma tarefa a partir da falha fictícia do portfólio. Confira se ela aparece em **Tarefas** com o vínculo ao serviço. Depois de salvar, selecione **Simular recuperação** no histórico. A tarefa permanece na lista durante a sessão da página.
 
 ## Aplicação local
 
