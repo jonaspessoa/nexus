@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexus — Workspace</title>
+<link rel="stylesheet" href="./style.css">
+<main>
+  <header><strong>NEXUS</strong><span>Workspace pessoal · Demonstração</span></header>
+  <h1>Visão geral</h1>
+  <div class="grid">
+    <section aria-labelledby="services">
+      <h2 id="services">Serviços</h2>
+      <article>
+        <p class="status">Indisponível</p>
+        <h3>Portfólio</h3>
+        <p>jonaspessoa.github.io</p>
+        <details>
+          <summary>Ver histórico</summary>
+          <ul>
+            <li>Hoje, 09:12 — HTTP 503</li>
+            <li>Hoje, 09:07 — HTTP 200</li>
+          </ul>
+          <button id="investigate" type="button">Criar tarefa de investigação</button>
+        </details>
+      </article>
+    </section>
+    <section aria-labelledby="tasks" id="task-section">
+      <h2 id="tasks">Tarefas</h2>
+      <form hidden>
+        <label for="title">Título da tarefa</label>
+        <input id="title" required maxlength="120">
+        <p>Serviço vinculado: Portfólio</p>
+        <button>Salvar tarefa</button>
+        <button id="cancel" type="button">Cancelar</button>
+      </form>
+      <p id="feedback" role="status"></p>
+      <p id="empty">Nenhuma tarefa de investigação.</p>
+      <ul id="task-list"></ul>
+    </section>
+  </div>
+</main>
+<script src="./workspace.js"></script>
+</html>
