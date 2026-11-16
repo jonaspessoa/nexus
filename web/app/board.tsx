@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 
+import DevHub from "./devhub";
+
 const labels = { todo: "A fazer", in_progress: "Em andamento", done: "Concluído" };
 type Status = keyof typeof labels;
 type Project = { id: number; name: string };
@@ -120,6 +122,7 @@ export default function Board() {
             <button type="button" disabled={busy} onClick={() => setService(null)}>Cancelar</button>
           </form>
         )}
+        <DevHub />
         <section aria-labelledby="tasks">
           <h2 id="tasks">Tarefas</h2>
           {!workspace.tasks.length && <p>Nenhuma tarefa cadastrada.</p>}
