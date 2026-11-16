@@ -36,10 +36,15 @@ def run_once():
             if outcome == "down":
                 connection.execute(
                     text(
+                        "WITH opened AS ("
                         "INSERT INTO service_incidents (service_id, opened_at) VALUES (:id, :at) "
-                        "ON CONFLICT (service_id) WHERE resolved_at IS NULL DO NOTHING"
+                        "ON CONFLICT (service_id) WHERE resolved_at IS NULL DO NOTHING "
+                        "RETURNING service_id) "
+                        "INSERT INTO tasks (project_id, service_id, title) "
+                        "SELECT services.project_id, services.id, left(:prefix || services.name, 120) "
+                        "FROM opened JOIN services ON services.id = opened.service_id"
                     ),
-                    {"id": service.id, "at": checked_at},
+                    {"id": service.id, "at": checked_at, "prefix": "Investigar: "},
                 )
             elif outcome == "up":
                 connection.execute(

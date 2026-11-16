@@ -59,3 +59,6 @@ with database().connect() as connection:
         text("SELECT opened_at, resolved_at FROM service_incidents")
     ).one()
     assert incident.resolved_at > incident.opened_at, incident
+
+    task = connection.execute(text("SELECT service_id, status FROM tasks")).one()
+    assert task.service_id is not None and task.status == "todo", task
