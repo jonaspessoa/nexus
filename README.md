@@ -41,3 +41,5 @@ Depois da carga de exemplo, o Sentinel verifica o site do portfólio. A primeira
 O worker faz requisições HEAD às portas padrão de HTTP e HTTPS. Endereços locais e privados são bloqueados. Redirecionamentos são registrados pelo código retornado, sem uma segunda requisição. Alguns serviços não dão suporte a HEAD e podem aparecer como indisponíveis mesmo quando aceitam GET.
 
 Para alterar a frequência, defina `NEXUS_CHECK_INTERVAL_SECONDS` no `.env` (mínimo de 30 segundos) e rode `docker compose up -d`. A página indica atraso quando o último resultado tem mais de dois intervalos. Para investigar um worker parado, use `docker compose logs sentinel`.
+
+Veja também [backup e restauração](docs/backup.md).
