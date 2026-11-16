@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: nexus
+      POSTGRES_USER: nexus
+      POSTGRES_PASSWORD: ${NEXUS_DB_PASSWORD:?Configure NEXUS_DB_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "nexus", "-d", "nexus"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+  api:
+    build: ./api
+    environment:
+      DATABASE_URL: postgresql+psycopg://nexus:${NEXUS_DB_PASSWORD}@db:5432/nexus
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["sh", "-c", "alembic upgrade head && exec uvicorn main:app --host 0.0.0.0"]
+  web:
+    build: ./web
+    environment:
+      NEXUS_API_URL: http://api:8000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - api
+volumes:
+  postgres-data:
