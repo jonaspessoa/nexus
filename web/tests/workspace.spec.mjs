@@ -100,3 +100,16 @@ test("cadastra projeto e serviço sem a carga de exemplo", async ({ page }) => {
   await page.reload();
   await expect(project).toContainText("https://example.com/status");
 });
+
+test("mantém os formulários visíveis e o foco no celular", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(base);
+  const password = page.getByLabel("Senha do operador");
+  await password.press("Tab");
+  await expect(page.getByRole("button", { name: "Entrar" })).toBeFocused();
+  await expect(page.getByRole("button", { name: "Entrar" })).toHaveCSS("outline-style", "solid");
+  await password.fill(process.env.NEXUS_OPERATOR_PASSWORD);
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await expect(page.getByLabel("Nome do projeto")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+});
