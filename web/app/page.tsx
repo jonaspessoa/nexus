@@ -1,3 +1,5 @@
+import Board from "./board";
+
 export const dynamic = "force-dynamic";
 
 export default async function Workspace() {
@@ -11,6 +13,7 @@ export default async function Workspace() {
     <main>
       <h1>Nexus</h1>
       <p role="status">{response?.ok ? "API conectada" : "API indisponível"}</p>
+      <Board />
     </main>
   );
 }
