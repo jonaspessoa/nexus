@@ -63,3 +63,20 @@ test("sincroniza PRs e mantém o vínculo na tarefa", async ({ page }) => {
   await page.reload();
   await expect(task.getByRole("link", { name: "PR no GitHub" })).toHaveAttribute("href", url);
 });
+
+test("registra a recuperação sem perder a tarefa de investigação", async ({ page }) => {
+  await page.goto(base);
+  await page.getByLabel("Senha do operador").fill(process.env.NEXUS_OPERATOR_PASSWORD);
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await page.getByText("Histórico de verificações", { exact: true }).click();
+  await expect(page.getByText(/Queda detectada.*HTTP 503/)).toBeVisible();
+  await expect(page.getByText(/Recuperado.*HTTP 200/)).toBeVisible();
+  const title = "Investigar o HTTP 503";
+  await page.getByRole("button", { name: "Investigar Site do portfólio" }).click();
+  await page.getByLabel("Título da tarefa").fill(title);
+  await page.getByRole("button", { name: "Salvar tarefa" }).click();
+  const task = page.getByRole("listitem").filter({ hasText: title });
+  await expect(task).toContainText("Site do portfólio");
+  await page.reload();
+  await expect(task).toContainText("Site do portfólio");
+});
