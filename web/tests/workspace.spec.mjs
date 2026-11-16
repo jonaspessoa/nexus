@@ -41,6 +41,17 @@ test("sincroniza PRs e mantém o vínculo na tarefa", async ({ page }) => {
   }
   await expect(page.getByText(/Última sincronização:/)).toBeVisible();
 
+  const lastSync = page.getByText(/Última sincronização:/);
+  const previousSync = await lastSync.innerText();
+  const pullRequests = page.getByRole("button", { name: /Investigar PR #/ });
+  const previousCount = await pullRequests.count();
+  expect(previousCount).toBeGreaterThan(0);
+  await page.route("**/api/devhub/sync", route => route.fulfill({ status: 502 }));
+  await sync.click();
+  await expect(page.getByText("Falha ao sincronizar. Tente novamente.")).toBeVisible();
+  await expect(lastSync).toHaveText(previousSync);
+  await expect(pullRequests).toHaveCount(previousCount);
+
   const investigate = page.getByRole("button", { name: /Investigar PR #/ }).first();
   await investigate.click();
   const url = await page.getByRole("link", { name: "Abrir PR no GitHub" }).getAttribute("href");
