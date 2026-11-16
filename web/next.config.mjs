@@ -10,6 +10,8 @@ export default {
       { source: "/api/devhub", destination: api + "/devhub" },
       { source: "/api/devhub/sync", destination: api + "/devhub/sync" },
       { source: "/api/services/:id/checks", destination: api + "/services/:id/checks" },
+      { source: "/api/projects", destination: api + "/projects" },
+      { source: "/api/projects/:id/services", destination: api + "/projects/:id/services" },
     ];
   },
 };

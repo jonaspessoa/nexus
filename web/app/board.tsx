@@ -109,10 +109,33 @@ export default function Board() {
         <button disabled={busy} onClick={() => void perform(() => request("session", "DELETE"), "Não foi possível sair.")}>Sair</button>
         <section aria-labelledby="projects">
           <h2 id="projects">Projetos</h2>
+          <form onSubmit={async event => {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const name = new FormData(form).get("name");
+            if (await perform(() => request("projects", "POST", { name }), "Não foi possível criar o projeto.")) form.reset();
+          }}>
+            <label htmlFor="project-name">Nome do projeto</label>
+            <input id="project-name" name="name" required maxLength={120} />
+            <button disabled={busy}>Criar projeto</button>
+          </form>
           {!workspace.projects.length && <p>Nenhum projeto cadastrado.</p>}
           {workspace.projects.map(project => (
             <article key={project.id}>
               <h3>{project.name}</h3>
+              <details>
+                <summary>Adicionar serviço</summary>
+                <form onSubmit={async event => {
+                  event.preventDefault();
+                  const form = event.currentTarget;
+                  const body = Object.fromEntries(new FormData(form));
+                  if (await perform(() => request("projects/" + project.id + "/services", "POST", body), "Não foi possível cadastrar o serviço. Confira a URL e se ela já existe neste projeto.")) form.reset();
+                }}>
+                  <label>Nome do serviço <input name="name" required maxLength={120} /></label>
+                  <label>URL do serviço <input name="url" type="url" required maxLength={2048} /></label>
+                  <button disabled={busy}>Cadastrar serviço</button>
+                </form>
+              </details>
               {workspace.services.filter(item => item.project_id === project.id).map(item => (
                 <div key={item.id}>
                   <p>{item.name} · {item.url}</p>
