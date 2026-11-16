@@ -2,6 +2,8 @@
 
 import json
 import re
+import ssl
+import sys
 from urllib.request import Request, urlopen
 
 
@@ -15,7 +17,12 @@ def recent_activity(repository: str) -> list[dict]:
         f"https://api.github.com/repos/{repository}/issues?state=all&sort=updated&per_page=30",
         headers={"Accept": "application/vnd.github+json", "User-Agent": "Nexus-DevHub"},
     )
-    with urlopen(request, timeout=10) as response:
+    options = {}
+    if sys.platform == "win32":
+        from truststore import SSLContext
+
+        options["context"] = SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    with urlopen(request, timeout=10, **options) as response:
         payload = json.load(response)
 
     activity = []
