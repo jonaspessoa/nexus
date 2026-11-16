@@ -16,6 +16,7 @@ services:
     build: ./api
     environment:
       NEXUS_OPERATOR_PASSWORD: ${NEXUS_OPERATOR_PASSWORD:-}
+      NEXUS_GITHUB_REPOSITORY: "${NEXUS_GITHUB_REPOSITORY:-}"
       NEXUS_SECURE_COOKIE: "${NEXUS_SECURE_COOKIE:-0}"
       DATABASE_URL: postgresql+psycopg://nexus:${NEXUS_DB_PASSWORD}@db:5432/nexus
     depends_on:
