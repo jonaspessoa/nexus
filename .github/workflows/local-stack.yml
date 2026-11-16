@@ -30,18 +30,10 @@ jobs:
           test "$(docker compose exec -T db psql -U nexus -d nexus -Atc "SELECT count(*) FROM projects WHERE slug = 'portfolio-demo'")" = 1
           curl --fail --silent --show-error http://127.0.0.1:3000 -o workspace.html
           grep -q 'API conectada' workspace.html
-      - name: Load a controlled outage history
+      - name: Check the worker against a controlled HTTP endpoint
         run: |
           docker compose stop sentinel
-          docker compose exec -T db psql -v ON_ERROR_STOP=1 -U nexus -d nexus <<'SQL'
-          INSERT INTO service_checks (service_id, outcome, http_status, latency_ms, checked_at)
-          SELECT services.id, sample.outcome, sample.status, 20, now() - sample.age
-          FROM services JOIN projects ON projects.id = services.project_id
-          CROSS JOIN (VALUES ('up', 200, interval '2 minutes'),
-                             ('down', 503, interval '1 minute'),
-                             ('up', 200, interval '0 minutes')) AS sample(outcome, status, age)
-          WHERE projects.slug = 'portfolio-demo';
-          SQL
+          docker compose exec -T api python - < api/tests/check_worker_smoke.py
       - uses: actions/setup-node@v4
         with:
           node-version: 24
