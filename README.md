@@ -33,3 +33,11 @@ Abra http://127.0.0.1:3000 para conferir a conexão da interface com a API. A AP
 ## Atividade do GitHub
 
 Defina `NEXUS_GITHUB_REPOSITORY=usuario/repositorio` no arquivo `.env` e rode `docker compose up -d` para aplicar a configuração. No Workspace, selecione **Sincronizar** para consultar os 30 itens atualizados mais recentemente. A consulta funciona para repositórios públicos, sem token. O horário indica a última atualização bem-sucedida.
+
+## Monitoramento com Sentinel
+
+Depois da carga de exemplo, o Sentinel verifica o site do portfólio. A primeira leitura pode levar até cinco minutos. Abra **Histórico de verificações** no Workspace para ver o código HTTP, a latência e as transições entre queda e recuperação. Use **Investigar** para registrar uma tarefa ligada ao serviço.
+
+O worker faz requisições HEAD às portas padrão de HTTP e HTTPS. Endereços locais e privados são bloqueados. Redirecionamentos são registrados pelo código retornado, sem uma segunda requisição. Alguns serviços não dão suporte a HEAD e podem aparecer como indisponíveis mesmo quando aceitam GET.
+
+Para alterar a frequência, defina `NEXUS_CHECK_INTERVAL_SECONDS` no `.env` (mínimo de 30 segundos) e rode `docker compose up -d`. A página indica atraso quando o último resultado tem mais de dois intervalos. Para investigar um worker parado, use `docker compose logs sentinel`.
