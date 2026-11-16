@@ -38,6 +38,8 @@ jobs:
         with:
           node-version: 24
       - name: Test the operator journey
+        env:
+          NEXUS_TEST_OUTAGE_HISTORY: "1"
         working-directory: web
         run: |
           npm ci

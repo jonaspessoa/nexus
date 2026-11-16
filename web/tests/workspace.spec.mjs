@@ -65,6 +65,7 @@ test("sincroniza PRs e mantém o vínculo na tarefa", async ({ page }) => {
 });
 
 test("registra a recuperação sem perder a tarefa de investigação", async ({ page }) => {
+  test.skip(process.env.NEXUS_TEST_OUTAGE_HISTORY !== "1", "O histórico controlado é preparado pela CI.");
   await page.goto(base);
   await page.getByLabel("Senha do operador").fill(process.env.NEXUS_OPERATOR_PASSWORD);
   await page.getByRole("button", { name: "Entrar" }).click();
