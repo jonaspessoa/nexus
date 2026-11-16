@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 
 import DevHub from "./devhub";
+import ServiceHistory from "./service-history";
 
 const labels = { todo: "A fazer", in_progress: "Em andamento", done: "Concluído" };
 type Status = keyof typeof labels;
@@ -115,6 +116,7 @@ export default function Board() {
               {workspace.services.filter(item => item.project_id === project.id).map(item => (
                 <div key={item.id}>
                   <p>{item.name} · {item.url}</p>
+                  <ServiceHistory serviceId={item.id} />
                   <button disabled={busy} onClick={() => { setPullRequest(null); setService(item); }}>Investigar {item.name}</button>
                 </div>
               ))}

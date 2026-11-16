@@ -1,3 +1,6 @@
+import os
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 
@@ -22,4 +25,9 @@ def history(service_id: int):
             ),
             {"id": service_id},
         ).mappings()
-        return {"service": dict(service), "checks": [dict(row) for row in checks]}
+        results = [dict(row) for row in checks]
+        interval = int(os.getenv("NEXUS_CHECK_INTERVAL_SECONDS", "300"))
+        stale = bool(results) and (
+            datetime.now(timezone.utc) - results[0]["checked_at"]
+        ).total_seconds() > 2 * interval
+        return {"service": dict(service), "checks": results, "stale": stale}
