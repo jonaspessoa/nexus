@@ -7,6 +7,7 @@ const tasks = document.querySelector('#task-list');
 investigate.addEventListener('click', () => {
   form.hidden = false;
   title.value = 'Investigar indisponibilidade do portfólio';
+  title.setCustomValidity('');
   feedback.textContent = '';
   title.focus();
 });
