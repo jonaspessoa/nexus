@@ -18,3 +18,14 @@ O [roadmap](ROADMAP.md) detalha a ordem das entregas, os critérios de conclusã
 ## Protótipo local
 
 Abra `prototype/index.html` no navegador. Em **Serviços**, selecione **Ver histórico** e crie uma tarefa a partir da falha fictícia do portfólio. Confira se ela aparece em **Tarefas** com o vínculo ao serviço. As tarefas existem durante a sessão da página.
+
+## Aplicação local
+
+Com Docker Compose instalado, copie `.env.example` para `.env` e troque a senha de desenvolvimento. Por enquanto, use letras, números e hífens na senha porque ela também faz parte da URL de conexão.
+
+```sh
+docker compose up --build -d
+docker compose exec api python seed.py
+```
+
+Abra http://127.0.0.1:3000 para conferir a conexão da interface com a API. A API aplica a migração ao iniciar. O comando de carga pode ser repetido e mantém um único projeto de exemplo. Para parar a aplicação e preservar os dados, rode `docker compose down`.
