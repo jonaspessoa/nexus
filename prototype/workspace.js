@@ -3,6 +3,19 @@ const title = document.querySelector('#title');
 const investigate = document.querySelector('#investigate');
 const feedback = document.querySelector('#feedback');
 const tasks = document.querySelector('#task-list');
+const recover = document.querySelector('#recover');
+const serviceStatus = document.querySelector('#service-status');
+
+recover.addEventListener('click', () => {
+  const entry = document.createElement('li');
+  entry.textContent = 'Hoje, 09:17 — Recuperado · HTTP 200';
+  document.querySelector('#check-history').prepend(entry);
+  serviceStatus.textContent = 'Disponível';
+  serviceStatus.classList.add('available');
+  feedback.textContent = 'Serviço recuperado. A tarefa continua na lista.';
+  investigate.focus();
+  recover.hidden = true;
+});
 
 investigate.addEventListener('click', () => {
   form.hidden = false;
@@ -35,4 +48,5 @@ form.addEventListener('submit', (event) => {
   form.hidden = true;
   investigate.focus();
   feedback.textContent = 'Tarefa adicionada.';
+  recover.hidden = serviceStatus.classList.contains('available');
 });

@@ -11,16 +11,17 @@
     <section aria-labelledby="services">
       <h2 id="services">Serviços</h2>
       <article>
-        <p class="status">Indisponível</p>
+        <p id="service-status" class="status" role="status">Indisponível</p>
         <h3>Portfólio</h3>
         <p>jonaspessoa.github.io</p>
         <details>
           <summary>Ver histórico</summary>
-          <ul>
+          <ul id="check-history">
             <li>Hoje, 09:12 — HTTP 503</li>
             <li>Hoje, 09:07 — HTTP 200</li>
           </ul>
           <button id="investigate" type="button">Criar tarefa de investigação</button>
+          <button id="recover" type="button" hidden>Simular recuperação</button>
         </details>
       </article>
     </section>
