@@ -29,3 +29,7 @@ docker compose exec api python seed.py
 ```
 
 Abra http://127.0.0.1:3000 para conferir a conexão da interface com a API. A API aplica a migração ao iniciar. O comando de carga pode ser repetido e mantém um único projeto de exemplo. Para parar a aplicação e preservar os dados, rode `docker compose down`.
+
+## Atividade do GitHub
+
+Defina `NEXUS_GITHUB_REPOSITORY=usuario/repositorio` no arquivo `.env` e rode `docker compose up -d` para aplicar a configuração. No Workspace, selecione **Sincronizar** para consultar os 30 itens atualizados mais recentemente. A consulta funciona para repositórios públicos, sem token. O horário indica a última atualização bem-sucedida.

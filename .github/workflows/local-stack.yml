@@ -15,8 +15,11 @@ jobs:
     env:
       NEXUS_DB_PASSWORD: ci-only-password
       NEXUS_OPERATOR_PASSWORD: workspace-test-password
+      NEXUS_GITHUB_REPOSITORY: jonaspessoa/nexus
     steps:
       - uses: actions/checkout@v4
+      - name: Test GitHub response parsing
+        run: python3 -m unittest api.test_devhub
       - name: Build and start
         run: docker compose up --build -d
       - name: Check the workspace
