@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Test GitHub response parsing
-        run: python3 -m unittest api.test_devhub
+        run: python3 -m unittest api.test_devhub api.test_sentinel
       - name: Build and start
         run: docker compose up --build -d
       - name: Check the workspace
@@ -30,6 +30,10 @@ jobs:
           test "$(docker compose exec -T db psql -U nexus -d nexus -Atc "SELECT count(*) FROM projects WHERE slug = 'portfolio-demo'")" = 1
           curl --fail --silent --show-error http://127.0.0.1:3000 -o workspace.html
           grep -q 'API conectada' workspace.html
+      - name: Check the worker against a controlled HTTP endpoint
+        run: |
+          docker compose stop sentinel
+          docker compose exec -T api python - < api/tests/check_worker_smoke.py
       - uses: actions/setup-node@v4
         with:
           node-version: 24

@@ -17,12 +17,27 @@ services:
     environment:
       NEXUS_OPERATOR_PASSWORD: ${NEXUS_OPERATOR_PASSWORD:-}
       NEXUS_GITHUB_REPOSITORY: "${NEXUS_GITHUB_REPOSITORY:-}"
+      NEXUS_CHECK_INTERVAL_SECONDS: "${NEXUS_CHECK_INTERVAL_SECONDS:-300}"
       NEXUS_SECURE_COOKIE: "${NEXUS_SECURE_COOKIE:-0}"
       DATABASE_URL: postgresql+psycopg://nexus:${NEXUS_DB_PASSWORD}@db:5432/nexus
     depends_on:
       db:
         condition: service_healthy
     command: ["sh", "-c", "alembic upgrade head && exec uvicorn main:app --host 0.0.0.0"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8000/health', timeout=2).close()"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+  sentinel:
+    build: ./api
+    environment:
+      DATABASE_URL: postgresql+psycopg://nexus:${NEXUS_DB_PASSWORD}@db:5432/nexus
+      NEXUS_CHECK_INTERVAL_SECONDS: "${NEXUS_CHECK_INTERVAL_SECONDS:-300}"
+    depends_on:
+      api:
+        condition: service_healthy
+    command: ["python", "check_worker.py"]
   web:
     build: ./web
     environment:

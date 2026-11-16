@@ -9,6 +9,7 @@ export default {
       { source: "/api/tasks/:id", destination: api + "/tasks/:id" },
       { source: "/api/devhub", destination: api + "/devhub" },
       { source: "/api/devhub/sync", destination: api + "/devhub/sync" },
+      { source: "/api/services/:id/checks", destination: api + "/services/:id/checks" },
     ];
   },
 };
