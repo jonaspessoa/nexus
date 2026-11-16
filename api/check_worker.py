@@ -20,14 +20,35 @@ def run_once():
     for service in services:
         outcome, status, latency = check(service.url)
         with database().begin() as connection:
-            connection.execute(
+            current = connection.execute(
+                text("SELECT id FROM services WHERE id = :id AND url = :url FOR UPDATE"),
+                {"id": service.id, "url": service.url},
+            ).scalar_one_or_none()
+            if current is None:
+                continue
+            checked_at = connection.execute(
                 text(
                     "INSERT INTO service_checks (service_id, outcome, http_status, latency_ms) "
-                    "SELECT id, :outcome, :status, :latency FROM services "
-                    "WHERE id = :id AND url = :url"
+                    "VALUES (:id, :outcome, :status, :latency) RETURNING checked_at"
                 ),
-                dict(id=service.id, url=service.url, outcome=outcome, status=status, latency=latency),
-            )
+                dict(id=service.id, outcome=outcome, status=status, latency=latency),
+            ).scalar_one()
+            if outcome == "down":
+                connection.execute(
+                    text(
+                        "INSERT INTO service_incidents (service_id, opened_at) VALUES (:id, :at) "
+                        "ON CONFLICT (service_id) WHERE resolved_at IS NULL DO NOTHING"
+                    ),
+                    {"id": service.id, "at": checked_at},
+                )
+            elif outcome == "up":
+                connection.execute(
+                    text(
+                        "UPDATE service_incidents SET resolved_at = :at "
+                        "WHERE service_id = :id AND resolved_at IS NULL"
+                    ),
+                    {"id": service.id, "at": checked_at},
+                )
 
 
 def main():
