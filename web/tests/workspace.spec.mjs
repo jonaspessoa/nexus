@@ -72,6 +72,8 @@ test("registra a recuperação sem perder a tarefa de investigação", async ({ 
   await page.getByText("Histórico de verificações", { exact: true }).click();
   await expect(page.getByText(/Queda detectada.*HTTP 503/)).toBeVisible();
   await expect(page.getByText(/Recuperado.*HTTP 200/)).toBeVisible();
+  await page.getByText("Incidentes recentes", { exact: true }).click();
+  await expect(page.getByText(/Resolvido em/)).toBeVisible();
   const title = "Investigar o HTTP 503";
   await page.getByRole("button", { name: "Investigar Site do portfólio" }).click();
   await page.getByLabel("Título da tarefa").fill(title);

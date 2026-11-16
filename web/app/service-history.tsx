@@ -10,7 +10,8 @@ type Check = {
   http_status: number | null;
   latency_ms: number | null;
 };
-type History = { checks: Check[]; stale: boolean };
+type Incident = { id: number; opened_at: string; resolved_at: string | null };
+type History = { checks: Check[]; stale: boolean; incidents: Incident[] };
 
 export default function ServiceHistory({ serviceId }: { serviceId: number }) {
   const [history, setHistory] = useState<History | null>(null);
@@ -54,6 +55,21 @@ export default function ServiceHistory({ serviceId }: { serviceId: number }) {
           })}
         </ol>
       </details>
+      {history.incidents.length > 0 && (
+        <details>
+          <summary>Incidentes recentes</summary>
+          <ol>
+            {history.incidents.map(incident => (
+              <li key={incident.id}>
+                Aberto em <time dateTime={incident.opened_at}>{new Date(incident.opened_at).toLocaleString("pt-BR")}</time>
+                {incident.resolved_at
+                  ? <> · Resolvido em <time dateTime={incident.resolved_at}>{new Date(incident.resolved_at).toLocaleString("pt-BR")}</time></>
+                  : " · Em andamento"}
+              </li>
+            ))}
+          </ol>
+        </details>
+      )}
     </>
   );
 }

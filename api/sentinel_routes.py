@@ -30,4 +30,16 @@ def history(service_id: int):
         stale = bool(results) and (
             datetime.now(timezone.utc) - results[0]["checked_at"]
         ).total_seconds() > 2 * interval
-        return {"service": dict(service), "checks": results, "stale": stale}
+        incidents = connection.execute(
+            text(
+                "SELECT id, opened_at, resolved_at FROM service_incidents "
+                "WHERE service_id = :id ORDER BY opened_at DESC, id DESC LIMIT 20"
+            ),
+            {"id": service_id},
+        ).mappings()
+        return {
+            "service": dict(service),
+            "checks": results,
+            "stale": stale,
+            "incidents": [dict(row) for row in incidents],
+        }
