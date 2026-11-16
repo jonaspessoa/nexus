@@ -8,7 +8,7 @@ const labels = { todo: "A fazer", in_progress: "Em andamento", done: "Concluído
 type Status = keyof typeof labels;
 type Project = { id: number; name: string };
 type Service = { id: number; project_id: number; name: string; url: string };
-type Task = { id: number; project_id: number; service_id: number | null; title: string; status: Status };
+type Task = { id: number; project_id: number; service_id: number | null; title: string; status: Status; pull_request_url: string | null };
 type Workspace = { projects: Project[]; services: Service[]; tasks: Task[] };
 
 async function request(path: string, method = "GET", body?: object) {
@@ -27,11 +27,14 @@ export default function Board() {
   const [error, setError] = useState("");
   const [service, setService] = useState<Service | null>(null);
 
+  const [pullRequest, setPullRequest] = useState<string | null>(null);
+
   async function refresh() {
     const response = await request("workspace");
     if (response.status === 401) {
       setWorkspace(null);
       setService(null);
+      setPullRequest(null);
     } else if (response.ok) {
       setWorkspace(await response.json());
     } else {
@@ -72,17 +75,22 @@ export default function Board() {
 
   async function addTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!service) return;
-    const title = String(new FormData(event.currentTarget).get("title")).trim();
+    if (!service && !pullRequest) return;
+    const fields = new FormData(event.currentTarget);
+    const title = String(fields.get("title")).trim();
+    const projectId = service?.project_id ?? Number(fields.get("project"));
     if (!title) {
       setError("Digite um título para a tarefa.");
       return;
     }
     const saved = await perform(
-      () => request("tasks", "POST", { project_id: service.project_id, service_id: service.id, title }),
+      () => request("tasks", "POST", { project_id: projectId, service_id: service?.id, pull_request_url: pullRequest, title }),
       "Não foi possível criar a tarefa.",
     );
-    if (saved) setService(null);
+    if (saved) {
+      setService(null);
+      setPullRequest(null);
+    }
   }
 
   if (loading) return <p role="status">Carregando Workspace…</p>;
@@ -107,22 +115,29 @@ export default function Board() {
               {workspace.services.filter(item => item.project_id === project.id).map(item => (
                 <div key={item.id}>
                   <p>{item.name} · {item.url}</p>
-                  <button disabled={busy} onClick={() => setService(item)}>Investigar {item.name}</button>
+                  <button disabled={busy} onClick={() => { setPullRequest(null); setService(item); }}>Investigar {item.name}</button>
                 </div>
               ))}
             </article>
           ))}
         </section>
-        {service && (
-          <form key={service.id} onSubmit={addTask}>
-            <h2>Investigar {service.name}</h2>
+        {(service || pullRequest) && (
+          <form key={service?.id ?? pullRequest} onSubmit={addTask}>
+            <h2>{service ? "Investigar " + service.name : "Criar tarefa para o PR"}</h2>
+            {pullRequest && <>
+              <p><a href={pullRequest}>Abrir PR no GitHub</a></p>
+              <label htmlFor="task-project">Projeto</label>
+              <select id="task-project" name="project" required>
+                {workspace.projects.map(project => <option key={project.id} value={project.id}>{project.name}</option>)}
+              </select>
+            </>}
             <label htmlFor="task-title">Título da tarefa</label>
             <input id="task-title" name="title" maxLength={120} required autoFocus />
             <button disabled={busy}>Salvar tarefa</button>
-            <button type="button" disabled={busy} onClick={() => setService(null)}>Cancelar</button>
+            <button type="button" disabled={busy} onClick={() => { setService(null); setPullRequest(null); }}>Cancelar</button>
           </form>
         )}
-        <DevHub />
+        <DevHub onInvestigate={url => { setService(null); setPullRequest(url); }} />
         <section aria-labelledby="tasks">
           <h2 id="tasks">Tarefas</h2>
           {!workspace.tasks.length && <p>Nenhuma tarefa cadastrada.</p>}
@@ -133,6 +148,7 @@ export default function Board() {
                 {workspace.tasks.filter(task => task.status === status).map(task => (
                   <li key={task.id}>
                     <strong>{task.title}</strong>
+                    {task.pull_request_url && <p><a href={task.pull_request_url}>PR no GitHub</a></p>}
                     <p>{workspace.services.find(item => item.id === task.service_id)?.name}</p>
                     <label htmlFor={"task-" + task.id}>Situação de {task.title}</label>
                     <select id={"task-" + task.id} value={task.status} disabled={busy} onChange={event =>

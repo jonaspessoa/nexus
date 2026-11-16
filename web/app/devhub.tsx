@@ -16,7 +16,7 @@ type Snapshot = {
   items: Activity[];
 };
 
-export default function DevHub() {
+export default function DevHub({ onInvestigate }: { onInvestigate: (url: string) => void }) {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState("");
@@ -59,6 +59,9 @@ export default function DevHub() {
               <li key={item.number}>
                 <a href={item.url}>{item.kind === "pull_request" ? "PR" : "Issue"} #{item.number} · {item.title}</a>
                 {" — "}{item.state === "open" ? "Em aberto" : "Encerrado"}
+                {item.kind === "pull_request" && (
+                  <button type="button" onClick={() => onInvestigate(item.url)}>Investigar PR #{item.number}</button>
+                )}
               </li>
             ))}
           </ul>

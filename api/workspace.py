@@ -13,6 +13,9 @@ TaskStatus = Literal["todo", "in_progress", "done"]
 class NewTask(BaseModel):
     project_id: int
     service_id: int | None = None
+    pull_request_url: Annotated[
+        str, StringConstraints(max_length=255, pattern=r"^https://github[.]com/[A-Za-z0-9-]+/[A-Za-z0-9_.-]+/pull/[1-9][0-9]*$")
+    ] | None = None
     title: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=120)]
 
 
@@ -28,7 +31,7 @@ def workspace():
             text("SELECT id, project_id, name, url FROM services ORDER BY name, id")
         )
         tasks = connection.execute(
-            text("SELECT id, project_id, service_id, title, status FROM tasks ORDER BY id")
+            text("SELECT id, project_id, service_id, title, status, pull_request_url FROM tasks ORDER BY id")
         )
         return {
             "projects": [dict(row) for row in projects.mappings()],
@@ -42,11 +45,11 @@ def create_task(body: NewTask):
     with database().begin() as connection:
         row = connection.execute(
             text(
-                "INSERT INTO tasks (project_id, service_id, title) "
-                "SELECT p.id, :service_id, :title FROM projects AS p "
+                "INSERT INTO tasks (project_id, service_id, title, pull_request_url) "
+                "SELECT p.id, :service_id, :title, :pull_request_url FROM projects AS p "
                 "WHERE p.id = :project_id AND (CAST(:service_id AS integer) IS NULL OR EXISTS ("
                 "SELECT 1 FROM services AS s WHERE s.id = :service_id AND s.project_id = p.id)) "
-                "RETURNING id, project_id, service_id, title, status"
+                "RETURNING id, project_id, service_id, title, status, pull_request_url"
             ),
             body.model_dump(),
         ).mappings().one_or_none()
@@ -61,7 +64,7 @@ def update_task(task_id: int, body: TaskUpdate):
         row = connection.execute(
             text(
                 "UPDATE tasks SET status = :status WHERE id = :id "
-                "RETURNING id, project_id, service_id, title, status"
+                "RETURNING id, project_id, service_id, title, status, pull_request_url"
             ),
             {"id": task_id, "status": body.status},
         ).mappings().one_or_none()
