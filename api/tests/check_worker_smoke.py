@@ -25,8 +25,12 @@ with HTTPServer(("127.0.0.1", 0), Fixture) as server:
 
     def connect_to_fixture(address, timeout, source_address):
         assert address == ("8.8.8.8", 80)
-        with patch("socket.getaddrinfo", resolve):
-            return original_connect(fixture_address, timeout, source_address)
+        return original_connect(fixture_address, timeout, source_address)
+
+    def resolve_fixture(host, port, *args, **kwargs):
+        if host == "example.com":
+            return [(0, 0, 0, "", ("8.8.8.8", 80))]
+        return resolve(host, port, *args, **kwargs)
 
     from session import database
     from sqlalchemy import text
@@ -36,7 +40,7 @@ with HTTPServer(("127.0.0.1", 0), Fixture) as server:
 
     try:
         with (
-            patch("sentinel.socket.getaddrinfo", return_value=[(0, 0, 0, "", ("8.8.8.8", 80))]),
+            patch("sentinel.socket.getaddrinfo", side_effect=resolve_fixture),
             patch("sentinel.socket.create_connection", side_effect=connect_to_fixture),
         ):
             for status in (200, 503, 200):
