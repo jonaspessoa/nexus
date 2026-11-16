@@ -23,3 +23,4 @@ button { background: #b3ceff; color: #111b2d; border: 1px solid transparent; cur
 input { display: block; width: 100%; border: 1px solid #66778e; background: #10141b; }
 :focus-visible { outline: 2px solid #ffcf86; outline-offset: 3px; }
 @media (max-width: 660px) { .grid { grid-template-columns: 1fr; } }
+.status.available { color: #99e1b1; }
