@@ -45,6 +45,13 @@ jobs:
           npm ci
           npx playwright install --with-deps chromium
           npx playwright test
+      - name: Restore a backup into a separate database
+        run: |
+          docker compose exec -T db pg_dump -U nexus -d nexus -Fc -f /tmp/nexus.dump
+          docker compose exec -T db createdb -U nexus nexus_restore
+          docker compose exec -T db pg_restore --exit-on-error -U nexus -d nexus_restore /tmp/nexus.dump
+          test "$(docker compose exec -T db psql -U nexus -d nexus_restore -Atc "SELECT count(*) FROM projects WHERE slug = 'portfolio-demo'")" = 1
+          test "$(docker compose exec -T db psql -U nexus -d nexus_restore -Atc "SELECT count(*) FROM service_checks WHERE http_status = 503")" -ge 1
       - name: Print service logs
         if: failure()
         run: docker compose logs --no-color
