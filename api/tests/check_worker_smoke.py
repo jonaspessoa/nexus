@@ -43,7 +43,7 @@ with HTTPServer(("127.0.0.1", 0), Fixture) as server:
             patch("sentinel.socket.getaddrinfo", side_effect=resolve_fixture),
             patch("sentinel.socket.create_connection", side_effect=connect_to_fixture),
         ):
-            for status in (200, 503, 200):
+            for status in (200, 503, 503, 200):
                 Fixture.status = status
                 run_once()
     finally:
@@ -51,6 +51,11 @@ with HTTPServer(("127.0.0.1", 0), Fixture) as server:
 
 with database().connect() as connection:
     statuses = connection.execute(
-        text("SELECT http_status FROM service_checks ORDER BY id DESC LIMIT 3")
+        text("SELECT http_status FROM service_checks ORDER BY id DESC LIMIT 4")
     ).scalars().all()
-    assert statuses == [200, 503, 200], statuses
+    assert statuses == [200, 503, 503, 200], statuses
+
+    incident = connection.execute(
+        text("SELECT opened_at, resolved_at FROM service_incidents")
+    ).one()
+    assert incident.resolved_at > incident.opened_at, incident
