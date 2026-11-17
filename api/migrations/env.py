@@ -1,9 +1,8 @@
-import os
-
 from alembic import context
 from sqlalchemy import create_engine
+from db_config import database_url
 
-url = os.environ["DATABASE_URL"]
+url = database_url()
 
 if context.is_offline_mode():
     context.configure(url=url, literal_binds=True)

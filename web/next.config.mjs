@@ -1,4 +1,6 @@
-const api = process.env.NEXUS_API_URL ?? "http://localhost:8000";
+const api = process.env.NEXUS_API_HOSTPORT
+  ? "http://" + process.env.NEXUS_API_HOSTPORT
+  : process.env.NEXUS_API_URL ?? "http://localhost:8000";
 
 export default {
   async rewrites() {
