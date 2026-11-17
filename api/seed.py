@@ -1,8 +1,7 @@
-import os
-
 from sqlalchemy import create_engine, text
 
-engine = create_engine(os.environ["DATABASE_URL"])
+from db_config import database_url
+engine = create_engine(database_url())
 with engine.begin() as connection:
     connection.execute(
         text(

@@ -1,6 +1,7 @@
 import hashlib
 import os
 import secrets
+from db_config import database_url
 from functools import lru_cache
 from typing import Annotated
 
@@ -15,7 +16,7 @@ SESSION_SECONDS = 8 * 60 * 60
 
 @lru_cache
 def database():
-    return create_engine(os.environ["DATABASE_URL"], pool_pre_ping=True)
+    return create_engine(database_url(), pool_pre_ping=True)
 
 
 def token_hash(token: str) -> str:
