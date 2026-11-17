@@ -17,7 +17,7 @@ O [roadmap](ROADMAP.md) detalha a ordem das entregas, os critérios de conclusã
 
 ## Demonstração
 
-Abra a [demo pública](https://jonaspessoa.github.io/nexus/) ou o arquivo `prototype/index.html` no navegador. Em **Serviços**, selecione **Ver histórico** e crie uma tarefa a partir da falha fictícia do portfólio. Confira se ela aparece em **Tarefas** com o vínculo ao serviço. Depois de salvar, selecione **Simular recuperação** no histórico. A tarefa permanece na lista durante a sessão da página.
+Abra a [demo pública](https://jonaspessoa.github.io/nexus/) ou o arquivo `prototype/index.html` no navegador. Em **Serviços**, selecione **Ver histórico** e crie uma tarefa a partir da falha fictícia do portfólio. Confira se ela aparece em **Tarefas** com o vínculo ao serviço. Depois de salvar, selecione **Simular recuperação** no histórico. A tarefa permanece na lista neste navegador mesmo após recarregar. Use **Reiniciar demonstração** para voltar à queda inicial.
 
 ## Aplicação local
 
